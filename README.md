@@ -13,6 +13,9 @@ Please note that this app is **100% vibecoded**.
 The way that this project works is by connecting your local machine to the dashboard is by using a tool called [mitmproxy](https://www.mitmproxy.org/), an open-source interactive HTTPS proxy for inspecting and modifying traffic. A ["mitmproxy addon"](https://docs.mitmproxy.org/stable/addons/overview/) is used to inspect the network requests of your local machine and look for any URLs that resemble a coding agent. This addon then updates the leaderboard via a webhook.
 
 ## 🔧 Setup
+
+The setup is an easy 3 step process.
+
 1. Install mitmproxy by following the tutorial [here](https://youtu.be/7BXsaU42yok?si=OLRoWVG0atnmPHGN)
 2. Run `mitmproxy` in your terminal using the following addon:
 ```
