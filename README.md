@@ -17,7 +17,7 @@ The way that this project works is by connecting your local machine to the dashb
 The setup is an easy 3 step process.
 
 1. Install mitmproxy by following the tutorial [here](https://youtu.be/7BXsaU42yok?si=OLRoWVG0atnmPHGN)
-2. Run `mitmproxy` in your terminal using the following addon:
+2. Run mitmproxy in your terminal using the following addon and command `mitmproxy -s ./clank_tracking.py`:
 ```
 # clank_tracking.py
 # mitmproxy_hello.py
