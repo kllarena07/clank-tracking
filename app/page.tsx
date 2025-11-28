@@ -1,5 +1,4 @@
 interface LeaderboardEntry {
-  rank: number;
   name: string;
   queries: number;
 }
@@ -48,28 +47,31 @@ export default async function Home() {
               </div>
             </div>
 
-            {leaderboard.map((user) => (
-              <div
-                key={user.rank}
-                className="grid grid-cols-3 gap-4 p-4 border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-              >
-                <div className="flex items-center">
-                  {user.rank <= 3 ? (
-                    <span className="text-2xl">
-                      {user.rank === 1 ? "🥇" : user.rank === 2 ? "🥈" : "🥉"}
-                    </span>
-                  ) : (
-                    <span className="text-zinc-500 dark:text-zinc-400">
-                      #{user.rank}
-                    </span>
-                  )}
+            {leaderboard.map((user, index) => {
+              const rank = index + 1;
+              return (
+                <div
+                  key={user.name}
+                  className="grid grid-cols-3 gap-4 p-4 border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  <div className="flex items-center">
+                    {rank <= 3 ? (
+                      <span className="text-2xl">
+                        {rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
+                      </span>
+                    ) : (
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        #{rank}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-black dark:text-zinc-50">{user.name}</div>
+                  <div className="text-right font-mono text-black dark:text-zinc-50">
+                    {user.queries.toLocaleString()}
+                  </div>
                 </div>
-                <div className="text-black dark:text-zinc-50">{user.name}</div>
-                <div className="text-right font-mono text-black dark:text-zinc-50">
-                  {user.queries.toLocaleString()}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">

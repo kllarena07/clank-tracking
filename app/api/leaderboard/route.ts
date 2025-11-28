@@ -1,17 +1,6 @@
 import { NextResponse } from "next/server";
 
-const leaderboard = [
-  { rank: 1, name: "Alice Chen", queries: 15420 },
-  { rank: 2, name: "Bob Smith", queries: 12850 },
-  { rank: 3, name: "Charlie Davis", queries: 11200 },
-  { rank: 4, name: "Diana Wilson", queries: 9875 },
-  { rank: 5, name: "Ethan Brown", queries: 8650 },
-  { rank: 6, name: "Fiona Martinez", queries: 7420 },
-  { rank: 7, name: "George Taylor", queries: 6300 },
-  { rank: 8, name: "Hannah Lee", queries: 5180 },
-  { rank: 9, name: "Ian Johnson", queries: 4250 },
-  { rank: 10, name: "Julia Garcia", queries: 3500 },
-];
+let leaderboard = [];
 
 export async function GET() {
   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -20,4 +9,86 @@ export async function GET() {
     data: leaderboard,
     lastUpdated: new Date().toISOString(),
   });
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { name, queries } = body;
+
+    if (!name || typeof queries !== "number") {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid request body. Expected { name: string, queries: number }",
+        },
+        { status: 400 },
+      );
+    }
+
+    const existingUser = leaderboard.find((user) => user.name === name);
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "User already exists. Use PATCH to update existing users." },
+        { status: 409 },
+      );
+    }
+
+    leaderboard.push({ name, queries });
+    leaderboard.sort((a, b) => b.queries - a.queries);
+
+    return NextResponse.json({
+      message: "User created successfully",
+      data: leaderboard,
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to parse request body" },
+      { status: 400 },
+    );
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { name, queries } = body;
+
+    if (!name || typeof queries !== "number") {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid request body. Expected { name: string, queries: number }",
+        },
+        { status: 400 },
+      );
+    }
+
+    const existingUserIndex = leaderboard.findIndex(
+      (user) => user.name === name,
+    );
+
+    if (existingUserIndex === -1) {
+      return NextResponse.json(
+        { error: "User not found. Use POST to create new users." },
+        { status: 404 },
+      );
+    }
+
+    leaderboard[existingUserIndex].queries += queries;
+    leaderboard.sort((a, b) => b.queries - a.queries);
+
+    return NextResponse.json({
+      message: "User updated successfully",
+      data: leaderboard,
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to parse request body" },
+      { status: 400 },
+    );
+  }
 }
