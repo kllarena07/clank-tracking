@@ -20,7 +20,7 @@ The setup is an easy 3 step process.
 2. Run mitmproxy in your terminal using the following addon and command `mitmproxy -s ./clank_tracking.py`:
 ```
 # clank_tracking.py
-# mitmproxy_hello.py
+# run using `mitmproxy -s ./clank_tracking.py`
 import re
 import threading
 from difflib import SequenceMatcher
