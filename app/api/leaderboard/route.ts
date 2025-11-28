@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-let leaderboard = [];
+interface LeaderboardEntry {
+  name: string;
+  queries: number;
+}
+
+const leaderboard: LeaderboardEntry[] = [];
 
 export async function GET() {
   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -43,7 +48,7 @@ export async function POST(request: Request) {
       data: leaderboard,
       lastUpdated: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to parse request body" },
       { status: 400 },
@@ -85,7 +90,7 @@ export async function PATCH(request: Request) {
       data: leaderboard,
       lastUpdated: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to parse request body" },
       { status: 400 },
