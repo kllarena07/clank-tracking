@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 interface LeaderboardEntry {
   name: string;
   queries: number;
@@ -8,20 +12,47 @@ interface ApiResponse {
   lastUpdated: string;
 }
 
-export default async function Home() {
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  const host = process.env.VERCEL_URL ? process.env.VERCEL_URL : 'localhost:3000';
-  const response = await fetch(`${protocol}://${host}/api/leaderboard`, {
-    cache: "no-store",
-  });
+export default function Home() {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
-  const { data: leaderboard, lastUpdated }: ApiResponse = await response.json();
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await fetch("/api/leaderboard", {
+        cache: "no-store",
+      });
+      const data: ApiResponse = await response.json();
+      setLeaderboard(data.data);
+      setLastUpdated(data.lastUpdated);
+    } catch (error) {
+      console.error("Failed to fetch leaderboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
+
+    const interval = setInterval(fetchLeaderboard, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const timeAgo = new Date(lastUpdated);
   const now = new Date();
   const minutesAgo = Math.floor(
     (now.getTime() - timeAgo.getTime()) / (1000 * 60),
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black flex items-center justify-center">
+        <div className="text-black dark:text-zinc-50">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
@@ -65,7 +96,9 @@ export default async function Home() {
                       </span>
                     )}
                   </div>
-                  <div className="text-black dark:text-zinc-50">{user.name}</div>
+                  <div className="text-black dark:text-zinc-50">
+                    {user.name}
+                  </div>
                   <div className="text-right font-mono text-black dark:text-zinc-50">
                     {user.queries.toLocaleString()}
                   </div>
@@ -75,8 +108,8 @@ export default async function Home() {
           </div>
 
           <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Data updated hourly • Last refresh: {minutesAgo}{" "}
-            {minutesAgo === 1 ? "minute" : "minutes"} ago
+            Last refresh: {minutesAgo} {minutesAgo === 1 ? "minute" : "minutes"}{" "}
+            ago • Auto-refresh every 5 seconds
           </div>
         </div>
       </main>
