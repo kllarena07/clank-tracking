@@ -1,16 +1,28 @@
-export default function Home() {
-  const leaderboard = [
-    { rank: 1, name: "Alice Chen", queries: 15420 },
-    { rank: 2, name: "Bob Smith", queries: 12850 },
-    { rank: 3, name: "Charlie Davis", queries: 11200 },
-    { rank: 4, name: "Diana Wilson", queries: 9875 },
-    { rank: 5, name: "Ethan Brown", queries: 8650 },
-    { rank: 6, name: "Fiona Martinez", queries: 7420 },
-    { rank: 7, name: "George Taylor", queries: 6300 },
-    { rank: 8, name: "Hannah Lee", queries: 5180 },
-    { rank: 9, name: "Ian Johnson", queries: 4250 },
-    { rank: 10, name: "Julia Garcia", queries: 3500 },
-  ];
+interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  queries: number;
+}
+
+interface ApiResponse {
+  data: LeaderboardEntry[];
+  lastUpdated: string;
+}
+
+export default async function Home() {
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const host = process.env.VERCEL_URL ? process.env.VERCEL_URL : 'localhost:3000';
+  const response = await fetch(`${protocol}://${host}/api/leaderboard`, {
+    cache: "no-store",
+  });
+
+  const { data: leaderboard, lastUpdated }: ApiResponse = await response.json();
+
+  const timeAgo = new Date(lastUpdated);
+  const now = new Date();
+  const minutesAgo = Math.floor(
+    (now.getTime() - timeAgo.getTime()) / (1000 * 60),
+  );
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
@@ -58,6 +70,11 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            Data updated hourly • Last refresh: {minutesAgo}{" "}
+            {minutesAgo === 1 ? "minute" : "minutes"} ago
           </div>
         </div>
       </main>
